@@ -12,11 +12,19 @@ namespace Fletchpike
     {
         public static float ToDB(this float value)
         {
-            return Mathf.Log10(value == 0 ? value : 0.001f) * 20;
+            return Mathf.Log10(value == 0 ? 0.001f : value) * 20;
         }
         public static float FromDB(this float value)
         {
             return Mathf.Pow(10, value / 20f);
+        }
+        public static float ToCents(this float value)
+        {
+            return 1200f * Mathf.Log(value, 2f);
+        }
+        public static float FromCents(this float value)
+        {
+            return Mathf.Pow(2f, value / 1200f);
         }
         /// <summary>
         /// Cut out Decimals of a Number string. (example: 1.24628 => 1.24)
@@ -45,8 +53,23 @@ namespace Fletchpike
             return (float)random.NextDouble();
         }
     }
+    public static class GameObjectExtensions
+    {
+        public static Transform[] GetChildren(this Transform transform)
+        {
+            var lis = new List<Transform>();
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                lis.Add(transform.GetChild(i));
+            }
+            return lis.ToArray();
+        }
+    }
     public static class ArrayListExtensions
     {
+        /// <summary>
+        /// Shuffle elements using the Fisher-Yates Algorithm
+        /// </summary>
         public static void Shuffle<T>(this List<T> list)
         {
             int n = list.Count;
@@ -58,6 +81,27 @@ namespace Fletchpike
                 list[k] = list[n];
                 list[n] = value;
             }
+        }
+        public static List<AudioClip> ExtractAudioClips(this IEnumerable<AudioContainerClip> list)
+        {
+            var lis = new List<AudioClip>();
+            foreach (var item in list)
+            {
+                lis.Add(item?.clip);
+            }
+            return lis;
+        }
+        public static List<GameObject> GetGameObjects(this IEnumerable<Component> list)
+        {
+            var lis = new List<GameObject>();
+            foreach (var item in list)
+            {
+                if (item != null)
+                {
+                    lis.Add(item.gameObject);
+                }
+            }
+            return lis;
         }
     }
     public static class AudioExtensions
@@ -72,6 +116,23 @@ namespace Fletchpike
             if (clips.Length < 1) return;
             audio.PlayOneShot(clips[Random.Range(0, clips.Length)], volumeScale);
         }
+        public static void PlayOneShot(this AudioSource audio, AudioContainer container, float volumeScale)
+        {
+            var clone = audio.CreateTemporaryCopy();
+            container.ApplyProperties(clone);
+            if (clone.clip == null)
+            {
+                Object.Destroy(clone.gameObject);
+                return;
+            }
+            clone.volume *= volumeScale;
+            clone.GetComponent<DeletionMark>().waitTime = clone.clip.length;
+            clone.gameObject.SetActive(true);
+        }
+        public static void PlayOneShot(this AudioSource audio, AudioContainer container)
+        {
+            audio.PlayOneShot(container, 1);
+        }
         public static bool IsAudioFilter(Component component)
         {
             var t = component.GetType();
@@ -81,6 +142,33 @@ namespace Fletchpike
             }
             if (IsCustomAudioFilter(component)) return true;
             return false;
+        }
+        /// <summary>
+        /// Creates a clone of this AudioSource thats hidden and has a deletion mark and has non audio components removed.
+        /// Starts activeSelf false
+        /// (Note will destroy if it doesnt play anything withen the next frame)
+        /// </summary>
+        /// <returns></returns>
+        public static AudioSource CreateTemporaryCopy(this AudioSource audio)
+        {
+            var clone = Object.Instantiate(audio.gameObject, audio.transform).GetComponent<AudioSource>();
+            foreach (var item in clone.transform.GetChildren()) Object.Destroy(item.gameObject);
+            clone.gameObject.SetActive(false);
+            foreach (var item in clone.GetComponents<Component>())
+            {
+                if (item is Transform || item is AudioBehaviour || IsAudioFilter(item))
+                { }
+                else
+                {
+                    Component.Destroy(item);
+                }
+            }
+            clone.gameObject.hideFlags = HideFlags.HideAndDontSave;
+            clone.playOnAwake = true;
+            var del = clone.gameObject.AddComponent<DeletionMark>();
+            del.markType = DeletionMarkType.AudioSource;
+            del.waitTime = audio.clip == null ? 1f : audio.clip.length;
+            return clone;
         }
         internal static bool IsCustomAudioFilter(Component component)
         {

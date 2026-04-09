@@ -8,5 +8,23 @@ namespace Fletchpike.Debug
         public IntegerRange intRange = new(0, 10, 0, 10);
         public SingleSlider floatSlider = new(0, 1);
         public IntegerSlider intSlider = new(0, 10);
+        public AudioContainer audioContainer;
+        private new AudioSource audio;
+        public bool play;
+        private void Update()
+        {
+            if (audio != null)
+            {
+                if (play)
+                {
+                    audio.PlayOneShot(audioContainer);
+                    play = false;
+                }
+            }
+        }
+        private void Start()
+        {
+            audio = GetComponent<AudioSource>();
+        }
     }
 }
