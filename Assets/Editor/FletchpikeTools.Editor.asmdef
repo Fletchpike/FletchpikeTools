@@ -1,0 +1,18 @@
+{
+    "name": "FletchpikeTools.Editor",
+    "rootNamespace": "Fletchpike.Editor",
+    "references": [
+        "GUID:136f441efc8145447b1b2448e7bc9896"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
