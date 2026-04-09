@@ -253,23 +253,21 @@ namespace Fletchpike.Editor
         {
             var arcs = new List<AudioResource>(Selection.GetFiltered<AudioResource>(SelectionMode.Assets));
             arcs.RemoveAll((item) => item.GetType().FullName != "UnityEngine.Audio.AudioRandomContainer");
-            if (arcs.Count > 0)
+            var p = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(Selection.activeObject));
+            if (arcs.Count < 1) Logging.LogWarning("No AudioRandomContainer(s) Selected!");
+            foreach (var arc in arcs)
             {
                 var inst = CreateInstance<AudioContainer>();
-                var con = new AudioRandomContainerAccess(arcs[0]);
+                var con = new AudioRandomContainerAccess(arc);
                 con.CreateAudioContainer(inst);
-                string path = "Assets/Converted Container.asset";
+                string path = $"{p}/{con.resource.name} AC.asset";
                 path = AssetDatabase.GenerateUniqueAssetPath(path);
                 AssetDatabase.CreateAsset(inst, path);
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-                EditorUtility.FocusProjectWindow();
                 Selection.activeObject = inst;
             }
-            else
-            {
-                Debug.Debug.LogWarning("No AudioRandomContainer Selected!");
-            }
+            EditorUtility.FocusProjectWindow();
+            AssetDatabase.Refresh();
         }
     }
     namespace Debug
