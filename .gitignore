@@ -27,6 +27,7 @@
 
 # Scenes Folder
 /[Aa]ssets/Scenes*
+*.Scenes.meta
 
 # Visual Studio cache directory
 .vs/
