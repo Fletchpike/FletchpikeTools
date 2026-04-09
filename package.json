@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "displayName": "Fletchpike Tools",
   "description": "A Simple Collection Of Code And Assets I Use For My Projects",
-  "unity": "6000",
+  "unity": "6000.0",
   "author": {
     "name": "Fletchpike",
     "url": "https://fletchpike.itch.io"
