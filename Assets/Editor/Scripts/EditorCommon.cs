@@ -170,7 +170,6 @@ namespace Fletchpike.Editor
             return EditorGUIUtility.singleLineHeight;
         }
     }
-    [CanEditMultipleObjects]
     [CustomEditor(typeof(AudioContainer))]
     public class AudioContainerEditor : UnityEditor.Editor
     {
