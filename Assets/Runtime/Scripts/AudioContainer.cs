@@ -15,6 +15,7 @@ namespace Fletchpike
         [SerializeField] private SingleRange _pitchRange = new(-3f, 3f, 1f, 1f);
         [SerializeField] private int _avoidRepeatingLast;
         [SerializeField] private ClipSelection _selectOrder;
+        [SerializeField] private DistanceReverb _distanceReverb = new();
         public bool useVolumeRandom;
         public bool usePitchRandom;
         private int index;
@@ -53,6 +54,20 @@ namespace Fletchpike
             {
                 pitchRange.min = value;
                 pitchRange.max = value;
+            }
+        }
+        /// <summary>
+        /// Settings For The Distance Based Reverb Effect
+        /// </summary>
+        public DistanceReverb distanceReverb
+        {
+            get
+            {
+                return _distanceReverb;
+            }
+            set
+            {
+                _distanceReverb = value;
             }
         }
 
@@ -124,11 +139,29 @@ namespace Fletchpike
                     return clip;
             }
         }
+        public int getActiveClips
+        {
+            get
+            {
+                int i = 0;
+                foreach (var item in clips)
+                {
+                    if (item.enabled) i++;
+                }
+                return i;
+            }
+        }
         public void ApplyProperties(AudioSource audio)
         {
             audio.resource = Next();
             audio.volume *= volumeRange.random;
             audio.pitch *= pitchRange.random;
+            if (distanceReverb.enabled)
+            {
+                var arc = audio.GetComponent<AudioReverbController>();
+                if (arc == null) arc = audio.gameObject.AddComponent<AudioReverbController>();
+                arc.settings = distanceReverb;
+            }
         }
         public enum ClipSelection
         {
@@ -137,6 +170,43 @@ namespace Fletchpike
             [InspectorName("Reverse")]
             Backward,
             Random
+        }
+        public enum DistanceReverbUpdateMode
+        {
+            [Tooltip("Update Whenever The GameObject Becomes Active")] Awake,
+            [Tooltip("More Performance Heavy")] Update
+        }
+        /// <summary>
+        /// A System To Add More Reverb The Farther A Object Is From The Audio Listener
+        /// </summary>
+        [System.Serializable]
+        public class DistanceReverb
+        {
+            [SerializeField, Tooltip("Will This Effect Exist")] private bool _enabled = false;
+            [Range(0, 1f), SerializeField, Tooltip("Max Amount Of Reverb It Can Apply")] private float _max = 1f;
+            [Range(0, 1f), SerializeField, Tooltip("Lower This Value Is Faster The Reverb Maxes Out")] private float _end = 0.75f;
+            [SerializeField, Tooltip("Times It Will Update The Reverb Amount")] private DistanceReverbUpdateMode _updateMode = DistanceReverbUpdateMode.Awake;
+
+            public bool enabled
+            {
+                get => _enabled;
+                set => _enabled = value;
+            }
+            public float max
+            {
+                get => _max;
+                set => _max = value;
+            }
+            public float end
+            {
+                get => _end;
+                set => _end = value;
+            }
+            public DistanceReverbUpdateMode updateMode
+            {
+                get => _updateMode;
+                set => _updateMode = value;
+            }
         }
     }
     [System.Serializable]

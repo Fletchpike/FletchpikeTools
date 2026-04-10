@@ -170,6 +170,38 @@ namespace Fletchpike.Editor
             return EditorGUIUtility.singleLineHeight;
         }
     }
+    [CustomPropertyDrawer(typeof(AudioContainer.DistanceReverb))]
+    public class DistanceReverbPropertyDrawer : PropertyDrawer
+    {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            //position = new(position.position + new Vector2(0, EditorGUIUtility.singleLineHeight * 1.5f), new(position.width, EditorGUIUtility.singleLineHeight * 3));
+            EditorGUI.BeginProperty(position, label, property);
+            var enabled = property.FindPropertyRelative("_enabled");
+            var max = property.FindPropertyRelative("_max");
+            var end = property.FindPropertyRelative("_end");
+            var updateMode = property.FindPropertyRelative("_updateMode");
+            Rect labelRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+            Rect enabledRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, position.width, EditorGUIUtility.singleLineHeight);
+            Rect maxRect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight * 2), position.width, EditorGUIUtility.singleLineHeight);
+            Rect endRect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight * 3), position.width, EditorGUIUtility.singleLineHeight);
+            Rect updateModeRect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight * 4), position.width, EditorGUIUtility.singleLineHeight);
+            EditorGUI.LabelField(labelRect, label, EditorStyles.boldLabel);
+            EditorGUI.indentLevel++;
+            EditorGUI.PropertyField(enabledRect, enabled);
+            EditorGUI.BeginDisabledGroup(!enabled.boolValue);
+            EditorGUI.PropertyField(maxRect, max);
+            EditorGUI.PropertyField(endRect, end);
+            EditorGUI.PropertyField(updateModeRect, updateMode);
+            EditorGUI.EndDisabledGroup();
+            EditorGUI.indentLevel--;
+            EditorGUI.EndProperty();
+        }
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return EditorGUIUtility.singleLineHeight * 5;
+        }
+    }
     [CustomEditor(typeof(AudioContainer))]
     public class AudioContainerEditor : UnityEditor.Editor
     {
@@ -178,6 +210,7 @@ namespace Fletchpike.Editor
             serializedObject.Update();
             var self = serializedObject.targetObject as AudioContainer;
             var clips = serializedObject.FindProperty("_clips");
+            var distanceReverb = serializedObject.FindProperty("_distanceReverb");
             var volumeRange = serializedObject.FindProperty("_volumeRange");
             var pitchRange = serializedObject.FindProperty("_pitchRange");
             var prefVR = serializedObject.FindProperty("useVolumeRandom");
@@ -216,16 +249,18 @@ namespace Fletchpike.Editor
             EditorGUILayout.PropertyField(selectOrder);
             if (selectOrder.enumValueIndex == (int)AudioContainer.ClipSelection.Random)
             {
-                if (clips.arraySize < 1)
+                if (self.getActiveClips < 1)
                 {
                     avoidRepeatingLast.intValue = 0;
                 }
                 else
                 {
-                    avoidRepeatingLast.intValue = Mathf.Clamp(avoidRepeatingLast.intValue, 0, clips.arraySize - 1);
+                    avoidRepeatingLast.intValue = Mathf.Clamp(avoidRepeatingLast.intValue, 0, self.getActiveClips - 1);
                 }
                 EditorGUILayout.PropertyField(avoidRepeatingLast);
             }
+            EditorGUILayout.Separator();
+            EditorGUILayout.PropertyField(distanceReverb);
             EditorGUILayout.Separator();
             if (GUILayout.Button("Preview"))
             {
@@ -238,7 +273,7 @@ namespace Fletchpike.Editor
                     source.Play();
                     var del = source.gameObject.AddComponent<DeletionMark>();
                     del.markType = DeletionMarkType.AudioSource;
-                    del.waitTime = source.clip.length;
+                    del.waitTime = 1f;
                 }
                 else
                 {
