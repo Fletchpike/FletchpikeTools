@@ -270,7 +270,7 @@ namespace Fletchpike
         {
             FindListener();
         }
-
+        
         internal static bool IsCustomAudioFilter(Component component)
         {
             MethodInfo method = component.GetType().GetMethod("OnAudioFilterRead",
@@ -305,6 +305,21 @@ namespace Fletchpike
         public static AudioReverbParameters GetParameters(this AudioReverbFilter reverb)
         {
             return new(reverb);
+        }
+        public static AudioClip CreateExtendedCopy(AudioClip clip)
+        {
+            var nclip = AudioClip.Create(clip.name + " Silence", clip.samples + (clip.frequency * 6), clip.channels, clip.frequency, false);
+            for (int i = 0; i < clip.samples; i++)
+            {
+                var dat = new float[4096];
+                clip.GetData(dat, i);
+                nclip.SetData(dat, i);
+            }
+            return nclip;
+        }
+        public static AudioClip CopyWithSilence(this AudioClip clip)
+        {
+            return CreateExtendedCopy(clip);
         }
     }
     [Serializable]

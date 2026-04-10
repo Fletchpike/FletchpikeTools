@@ -5,6 +5,7 @@ namespace Fletchpike
     [RequireComponent(typeof(AudioSource))]
     public class AudioReverbController : MonoBehaviour
     {
+        public bool extendWithSilence = true;
         public AudioContainer.DistanceReverbUpdateMode defaultUpdateMode;
         public new AudioSource audio { get; private set; }
         public AudioReverbFilter filter { get; private set; }
@@ -21,6 +22,10 @@ namespace Fletchpike
             if (filter == null)
             {
                 filter = gameObject.AddComponent<AudioReverbFilter>();
+            }
+            if (extendWithSilence)
+            {
+                audio.clip = audio.clip.CopyWithSilence();
             }
             RefreshReverb();
         }
