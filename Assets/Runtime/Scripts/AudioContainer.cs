@@ -174,7 +174,7 @@ namespace Fletchpike
         public enum DistanceReverbUpdateMode
         {
             [Tooltip("Update Whenever The GameObject Becomes Active")] Awake,
-            [Tooltip("More Performance Heavy")] Update
+            [Tooltip("Updates Whenever The Distance Between The Object And The Listener Changes Higher Then 0.5")] Update
         }
         /// <summary>
         /// A System To Add More Reverb The Farther A Object Is From The Audio Listener

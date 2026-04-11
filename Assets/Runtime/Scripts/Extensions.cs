@@ -170,6 +170,7 @@ namespace Fletchpike
         public static void PlayOneShot(this AudioSource audio, AudioContainer container, float volumeScale)
         {
             var clone = audio.CreateTemporaryCopy();
+            clone.GetComponent<DeletionMark>().enabled = false;
             container.ApplyProperties(clone);
             if (clone.clip == null)
             {
@@ -177,8 +178,10 @@ namespace Fletchpike
                 return;
             }
             clone.volume *= volumeScale;
+            clone.loop = false;
             clone.GetComponent<DeletionMark>().waitTime = clone.clip.length;
             clone.gameObject.SetActive(true);
+            clone.GetComponent<DeletionMark>().enabled = true;
         }
         public static void PlayOneShot(this AudioSource audio, AudioContainer container)
         {
@@ -238,9 +241,10 @@ namespace Fletchpike
         [RuntimeInitializeOnLoadMethod]
         internal static void Init()
         {
+            AudioReverbController.silenceAudioClipCache = new();
             ReverbParametersOff = AudioReverbParameters.GetPreset(AudioReverbPreset.Off);
             ReverbParametersPsychotic = AudioReverbParameters.GetPreset(AudioReverbPreset.Psychotic);
-            ReverbParametersPsychotic.room = -50;
+            ReverbParametersPsychotic.room = -100;
             manager = new GameObject("Audio Coroutine Manager").AddComponent<CoroutineManager>();
             Object.DontDestroyOnLoad(manager.gameObject);
             manager.StartCoroutine(AudioLoop());
@@ -308,13 +312,10 @@ namespace Fletchpike
         }
         public static AudioClip CreateExtendedCopy(AudioClip clip)
         {
-            var nclip = AudioClip.Create(clip.name + " Silence", clip.samples + (clip.frequency * 6), clip.channels, clip.frequency, false);
-            for (int i = 0; i < clip.samples; i++)
-            {
-                var dat = new float[4096];
-                clip.GetData(dat, i);
-                nclip.SetData(dat, i);
-            }
+            var nclip = AudioClip.Create(clip.name + " Silence", clip.samples + (clip.frequency * 10), clip.channels, clip.frequency, false);
+            var data = new float[clip.channels * clip.samples];
+            clip.GetData(data, 0);
+            nclip.SetData(data, 0);
             return nclip;
         }
         public static AudioClip CopyWithSilence(this AudioClip clip)

@@ -17,7 +17,7 @@ namespace Fletchpike.Debug
             {
                 if (play)
                 {
-                    audio.PlayOneShot(audioContainer);
+                    audio.PlayContainer();
                     play = false;
                 }
             }
