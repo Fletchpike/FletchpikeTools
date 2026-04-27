@@ -150,6 +150,27 @@ namespace Fletchpike.Editor
             return EditorGUIUtility.singleLineHeight;
         }
     }
+    [CustomPropertyDrawer(typeof(HSV))]
+    public class HSVPropertyDrawer : PropertyDrawer
+    {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            EditorGUI.BeginProperty(position, label, property);
+            position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+            var h = property.FindPropertyRelative("_h");
+            var s = property.FindPropertyRelative("_s");
+            var v = property.FindPropertyRelative("_v");
+            var hsv = (HSV)EditorGUI.ColorField(position, Color.HSVToRGB(h.floatValue, s.floatValue, v.floatValue));
+            h.floatValue = hsv.h;
+            s.floatValue = hsv.s;
+            v.floatValue = hsv.v;
+            EditorGUI.EndProperty();
+        }
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            return EditorGUIUtility.singleLineHeight;
+        }
+    }
     [CustomPropertyDrawer(typeof(AudioContainerClip))]
     public class AudioContainerClipPropertyDrawer : PropertyDrawer
     {

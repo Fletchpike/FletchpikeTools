@@ -9,6 +9,7 @@ namespace Fletchpike.Debug
         public SingleSlider floatSlider = new(0, 1);
         public IntegerSlider intSlider = new(0, 10);
         public AudioContainer audioContainer;
+        public HSV hsv;
         private new AudioSource audio;
         public bool play;
         private void Update()

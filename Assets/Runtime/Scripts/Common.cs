@@ -152,6 +152,140 @@ namespace Fletchpike
             return slider.value;
         }
     }
+    [System.Serializable]
+    public struct HSV
+    {
+        [SerializeField]
+        private float _h;
+        [SerializeField]
+        private float _s;
+        [SerializeField]
+        private float _v;
+        public float h
+        {
+            get
+            {
+                return _h;
+            }
+            set
+            {
+                _h = value;
+            }
+        }
+        public float s
+        {
+            get
+            {
+                return _s;
+            }
+            set
+            {
+                _s = value;
+            }
+        }
+        public float v
+        {
+            get
+            {
+                return _v;
+            }
+            set
+            {
+                _v = value;
+            }
+        }
+        public Color color
+        {
+            get
+            {
+                return Color.HSVToRGB(h, s, v);
+            }
+        }
+        public HSV(float h, float s, float v)
+        {
+            _h = h;
+            _s = s;
+            _v = v;
+        }
+        public static HSV RGBtoHSV(Color color)
+        {
+            Color.RGBToHSV(color, out float h, out float s, out float v);
+            return new HSV(h, s, v);
+        }
+        public static HSV LerpUnclamped(HSV a, HSV b, float t)
+        {
+            return a + (b - a) * t;
+        }
+        public static HSV Lerp(HSV a, HSV b, float t)
+        {
+            return LerpUnclamped(a, b, Mathf.Clamp01(t));
+        }
+        public static implicit operator Color(HSV hsv)
+        {
+            return hsv.color;
+        }
+        public static implicit operator HSV(Color color)
+        {
+            return RGBtoHSV(color);
+        }
+        public static HSV operator +(HSV a, HSV b)
+        {
+            return new()
+            {
+                h = a.h + b.h,
+                s = a.s + b.s,
+                v = a.v + b.v
+            };
+        }
+        public static HSV operator -(HSV a, HSV b)
+        {
+            return new()
+            {
+                h = a.h - b.h,
+                s = a.s - b.s,
+                v = a.v - b.v
+            };
+        }
+        public static HSV operator *(HSV a, HSV b)
+        {
+            return new()
+            {
+                h = a.h * b.h,
+                s = a.s * b.s,
+                v = a.v * b.v
+            };
+        }
+        public static HSV operator *(HSV a, float b)
+        {
+            return new()
+            {
+                h = a.h * b,
+                s = a.s * b,
+                v = a.v * b
+            };
+        }
+        public static HSV operator /(HSV a, HSV b)
+        {
+            return new()
+            {
+                h = a.h / b.h,
+                s = a.s / b.s,
+                v = a.v / b.v
+            };
+        }
+        public static HSV operator /(HSV a, float b)
+        {
+            return new()
+            {
+                h = a.h / b,
+                s = a.s / b,
+                v = a.v / b
+            };
+        }
+
+        public static HSV white => new(0, 0, 1);
+        public static HSV black => new(0, 0, 0);
+    }
     public static class Tools
     {
         public static Dictionary<string, Object> LoadCache { get; } = new();

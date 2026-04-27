@@ -252,7 +252,7 @@ namespace Fletchpike
         }
         internal static void FindListener()
         {
-            listener = Object.FindFirstObjectByType<AudioListener>(FindObjectsInactive.Exclude);
+            listener = Object.FindAnyObjectByType<AudioListener>(FindObjectsInactive.Exclude);
         }
         public static float DistanceFromListener(Vector3 position)
         {
@@ -359,22 +359,23 @@ namespace Fletchpike
         }
         public static AudioReverbParameters LerpUnclamped(AudioReverbParameters a, AudioReverbParameters b, float t)
         {
-            AudioReverbParameters para = new();
-            para.decayHFRatio = Mathf.LerpUnclamped(a.decayHFRatio, b.decayHFRatio, t);
-            para.decayTime = Mathf.LerpUnclamped(a.decayTime, b.decayTime, t);
-            para.density = Mathf.LerpUnclamped(a.density, b.density, t);
-            para.diffusion = Mathf.LerpUnclamped(a.diffusion, b.diffusion, t);
-            para.dryLevel = Mathf.LerpUnclamped(a.dryLevel, b.dryLevel, t);
-            para.hfReference = Mathf.LerpUnclamped(a.hfReference, b.hfReference, t);
-            para.lfReference = Mathf.LerpUnclamped(a.lfReference, b.lfReference, t);
-            para.reflectionsDelay = Mathf.LerpUnclamped(a.reflectionsDelay, b.reflectionsDelay, t);
-            para.reflectionsLevel = Mathf.LerpUnclamped(a.reflectionsLevel, b.reflectionsLevel, t);
-            para.reverbDelay = Mathf.LerpUnclamped(a.reverbDelay, b.reverbDelay, t);
-            para.reverbLevel = Mathf.LerpUnclamped(a.reverbLevel, b.reverbLevel, t);
-            para.room = Mathf.LerpUnclamped(a.room, b.room, t);
-            para.roomHF = Mathf.LerpUnclamped(a.roomHF, b.roomHF, t);
-            para.roomLF = Mathf.LerpUnclamped(a.roomLF, b.roomLF, t);
-            return para;
+            return new()
+            {
+                decayHFRatio = Mathf.LerpUnclamped(a.decayHFRatio, b.decayHFRatio, t),
+                decayTime = Mathf.LerpUnclamped(a.decayTime, b.decayTime, t),
+                density = Mathf.LerpUnclamped(a.density, b.density, t),
+                diffusion = Mathf.LerpUnclamped(a.diffusion, b.diffusion, t),
+                dryLevel = Mathf.LerpUnclamped(a.dryLevel, b.dryLevel, t),
+                hfReference = Mathf.LerpUnclamped(a.hfReference, b.hfReference, t),
+                lfReference = Mathf.LerpUnclamped(a.lfReference, b.lfReference, t),
+                reflectionsDelay = Mathf.LerpUnclamped(a.reflectionsDelay, b.reflectionsDelay, t),
+                reflectionsLevel = Mathf.LerpUnclamped(a.reflectionsLevel, b.reflectionsLevel, t),
+                reverbDelay = Mathf.LerpUnclamped(a.reverbDelay, b.reverbDelay, t),
+                reverbLevel = Mathf.LerpUnclamped(a.reverbLevel, b.reverbLevel, t),
+                room = Mathf.LerpUnclamped(a.room, b.room, t),
+                roomHF = Mathf.LerpUnclamped(a.roomHF, b.roomHF, t),
+                roomLF = Mathf.LerpUnclamped(a.roomLF, b.roomLF, t)
+            };
         }
         public static AudioReverbParameters GetPreset(AudioReverbPreset preset)
         {
