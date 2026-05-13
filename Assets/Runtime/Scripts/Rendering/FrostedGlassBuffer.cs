@@ -8,7 +8,6 @@ namespace Fletchpike
     [RequireComponent(typeof(Camera))]
     [DisallowMultipleComponent]
     [AddComponentMenu("Rendering/Frosted Glass Buffer")]
-    [Tooltip("Required For The Frosted Glass Shader To Work.")]
     public class FrostedGlassBuffer : MonoBehaviour
     {
         Shader _Shader;
