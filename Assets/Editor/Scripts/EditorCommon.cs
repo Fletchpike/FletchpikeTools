@@ -345,6 +345,26 @@ namespace Fletchpike.Editor
                     }
                 }
             }
+            [MenuItem("Tools/Debug/Set Hidden")]
+            public static void SetHidden()
+            {
+                foreach (var item in Selection.objects)
+                {
+                    item.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+                    EditorUtility.SetDirty(item);
+                }
+                AssetDatabase.SaveAssets();
+            }
+            [MenuItem("Tools/Debug/Set Visible")]
+            public static void SetVisible()
+            {
+                foreach (var item in Selection.objects)
+                {
+                    item.hideFlags = HideFlags.None;
+                    EditorUtility.SetDirty(item);
+                }
+                AssetDatabase.SaveAssets();
+            }
             public static void Log(object message) => Logging.Log(message);
             public static void LogWarning(object message) => Logging.LogWarning(message);
             public static void LogError(object message) => Logging.LogError(message);
