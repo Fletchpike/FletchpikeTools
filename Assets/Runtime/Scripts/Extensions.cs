@@ -157,6 +157,8 @@ namespace Fletchpike
         public static AudioListener listener { get; set; }
         public static AudioReverbParameters ReverbParametersOff;
         public static AudioReverbParameters ReverbParametersPsychotic;
+        public static AudioReverbParameters ReverbParametersNewOff;
+        public static AudioReverbParameters ReverbParametersNewReverb;
         public static void PlayOneShot(this AudioSource audio, AudioClip[] clips)
         {
             if (clips.Length < 1) return;
@@ -244,6 +246,10 @@ namespace Fletchpike
             AudioReverbController.silenceAudioClipCache = new();
             ReverbParametersOff = AudioReverbParameters.GetPreset(AudioReverbPreset.Off);
             ReverbParametersPsychotic = AudioReverbParameters.GetPreset(AudioReverbPreset.Psychotic);
+            ReverbParametersNewOff = AudioReverbParameters.GetPreset(AudioReverbPreset.Psychotic);
+            ReverbParametersNewOff.reverbLevel = -250;
+            ReverbParametersNewReverb = AudioReverbParameters.GetPreset(AudioReverbPreset.Psychotic);
+            ReverbParametersNewReverb.reverbLevel = 1000;
             ReverbParametersPsychotic.room = -100;
             manager = new GameObject("Audio Coroutine Manager").AddComponent<CoroutineManager>();
             Object.DontDestroyOnLoad(manager.gameObject);

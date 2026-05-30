@@ -10,6 +10,7 @@ namespace Fletchpike
         [Tooltip("Play Clip After Silence Clip Is Added")]
         public bool playOnStart = true;
         public AudioContainer.DistanceReverbUpdateMode defaultUpdateMode;
+        public static ReverbControl reverbControl { get; set; } = ReverbControl.New;
         public new AudioSource audio { get; private set; }
         public AudioReverbFilter filter { get; private set; }
         public AudioContainer.DistanceReverb settings { get; set; }
@@ -61,12 +62,7 @@ namespace Fletchpike
         {
             if (settings.updateMode == AudioContainer.DistanceReverbUpdateMode.Update)
             {
-                var listDist = DistanceFromListener();
-                if (Mathf.Abs(lastDistance - listDist) > 0.5f)
-                {
-                    lastDistance = listDist;
-                    RefreshReverb();
-                }
+                TryRefreshReverb();
             }
         }
         private void OnEnable()
@@ -77,13 +73,36 @@ namespace Fletchpike
                 RefreshReverb();
             }
         }
+        public void TryRefreshReverb()
+        {
+            var listDist = DistanceFromListener();
+            if (Mathf.Abs(lastDistance - listDist) > 0.5f)
+            {
+                lastDistance = listDist;
+                RefreshReverb();
+            }
+        }
         public void RefreshReverb()
         {
             if (settings == null) return;
             ComponentRefresh();
             var dist = Mathf.Clamp(DistanceFromListener() / audio.maxDistance / settings.end, 0, settings.max);
-            filter.SetParameters(AudioReverbParameters.Lerp(AudioExtensions.ReverbParametersOff, AudioExtensions.ReverbParametersPsychotic, dist));
+            if (reverbControl == ReverbControl.Legacy)
+            {
+                filter.SetParameters(AudioReverbParameters.Lerp(AudioExtensions.ReverbParametersOff, AudioExtensions.ReverbParametersPsychotic, dist));
+            }
+            else if (reverbControl == ReverbControl.New)
+            {
+                var n = AudioExtensions.ReverbParametersNewOff;
+                n.reverbLevel = Mathf.Lerp(-250, 1000, dist);
+                filter.SetParameters(n);
+            }
         }
         public float DistanceFromListener() => AudioExtensions.DistanceFromListener(transform.position);
+    }
+    public enum ReverbControl
+    {
+        New,
+        Legacy
     }
 }
