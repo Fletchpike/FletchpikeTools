@@ -27,29 +27,46 @@ namespace Fletchpike
                 }
             }
         }
-        private void Start()
+        public void PlayOneShot(AudioClip clip, float volumeScale)
         {
-            if (settings == null)
-            {
-                settings = new() { enabled = true, updateMode = defaultUpdateMode};
-            }
-            ComponentRefresh();
+            clip = SetupAudioClip(clip);
+            audio.PlayOneShot(clip, volumeScale);
+        }
+        public void PlayOneShot(AudioClip clip)
+        {
+            PlayOneShot(clip, 1f);
+        }
+        public AudioClip SetupAudioClip(AudioClip clip)
+        {
             if (extendWithSilence)
             {
-                if (audio.clip.loadState == AudioDataLoadState.Unloaded)
+                if (clip.loadState == AudioDataLoadState.Unloaded)
                 {
-                    audio.clip.LoadAudioData();
+                    clip.LoadAudioData();
                 }
-                if (silenceAudioClipCache.TryGetValue(audio.clip, out var silence))
+                if (silenceAudioClipCache.TryGetValue(clip, out var silence))
                 {
-                    audio.clip = silence;
+                    return silence;
                 }
                 else
                 {
-                    var si = audio.clip.CopyWithSilence();
-                    silenceAudioClipCache.Add(audio.clip, si);
-                    audio.clip = si;
+                    var si = clip.CopyWithSilence();
+                    silenceAudioClipCache.Add(clip, si);
+                    return si;
                 }
+            }
+            else
+            {
+                return clip;
+            }
+        }
+        private void Start()
+        {
+            settings ??= new() { enabled = true, updateMode = defaultUpdateMode};
+            ComponentRefresh();
+            if (extendWithSilence)
+            {
+                audio.clip = SetupAudioClip(audio.clip);
             }
             if (playOnStart)
             {

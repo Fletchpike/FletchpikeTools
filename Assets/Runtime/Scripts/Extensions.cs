@@ -187,6 +187,21 @@ namespace Fletchpike
         {
             audio.PlayOneShot(container, 1);
         }
+        public static void PlayOneShotReverb(this AudioSource audio, AudioClip clip, float volumeScale)
+        {
+            if (audio.TryGetComponent<AudioReverbController>(out var reverb))
+            {
+                reverb.PlayOneShot(clip, volumeScale);
+            }
+            else
+            {
+                audio.PlayOneShot(clip);
+            }
+        }
+        public static void PlayOneShotReverb(this AudioSource audio, AudioClip clip)
+        {
+            audio.PlayOneShotReverb(clip, 1f);
+        }
         /// <summary>
         /// Plays The AudioContainer Assigned To A AudioContainerSource
         /// </summary>
