@@ -65,13 +65,16 @@ namespace Fletchpike
         {
             settings ??= new() { enabled = true, updateMode = defaultUpdateMode};
             ComponentRefresh();
-            if (extendWithSilence)
+            if (audio.clip != null)
             {
-                audio.clip = SetupAudioClip(audio.clip);
-            }
-            if (playOnStart)
-            {
-                audio.Play();
+                if (extendWithSilence)
+                {
+                    audio.clip = SetupAudioClip(audio.clip);
+                }
+                if (playOnStart)
+                {
+                    audio.Play();
+                }
             }
             RefreshReverb();
         }

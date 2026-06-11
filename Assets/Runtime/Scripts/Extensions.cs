@@ -555,5 +555,9 @@ namespace Fletchpike
             var r = (float)h / (float)targetSize;
             return source.ResizeNearestNeighbor(Mathf.FloorToInt((float)source.width / r), Mathf.FloorToInt((float)source.height / r));
         }
+        public static bool IsSupported(this RenderTextureFormat format)
+        {
+            return SystemInfo.SupportsRenderTextureFormat(format);
+        }
     }
 }
